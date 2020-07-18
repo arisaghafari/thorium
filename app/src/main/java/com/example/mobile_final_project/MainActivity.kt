@@ -182,6 +182,18 @@ class MainActivity : AppCompatActivity()
         PLMNView.text = "Serving cell PLMN : " + servingCellPLMN
         CellIdView.text = "Serving cell id : " + servingCellId.toString()
         NetworkTypeView.text = "Network Type : " + getNetworkType()
+        if (servingCellLAC != 0)
+        {
+            ACView.text = "Serving cell area code : " + servingCellLAC.toString()
+        }
+        else if(servingCellTAC != 0)
+        {
+            ACView.text = "Serving cell area code : " + servingCellTAC.toString()
+        }
+        else if(servingCellRAC != 0)
+        {
+            ACView.text = "Serving cell area code : " + servingCellRAC.toString()
+        }
         //Build a request to turn on the location
     }
     fun getNetworkType(): String{
