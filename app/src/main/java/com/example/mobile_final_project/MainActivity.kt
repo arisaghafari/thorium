@@ -1,17 +1,21 @@
 package com.example.mobile_final_project
 import android.Manifest
 import android.content.Context
-import android.content.IntentSender
+import java.time.LocalDateTime
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.telephony.CellInfoGsm
 import android.telephony.CellInfoLte
 import android.telephony.CellInfoWcdma
 import android.telephony.TelephonyManager
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
 
 class MainActivity : AppCompatActivity()
@@ -34,7 +38,7 @@ class MainActivity : AppCompatActivity()
                 REQUEST_CODE
             )
         }*/
-        SignalStrength()
+        prameters()
         mTextView = findViewById(R.id.connection_class)
         mTrafficSpeedMeasurer = TrafficSpeedMeasurer(TrafficSpeedMeasurer.TrafficType.ALL)
         mTrafficSpeedMeasurer!!.startMeasuring()
@@ -80,7 +84,8 @@ class MainActivity : AppCompatActivity()
     {
         private const val SHOW_SPEED_IN_BITS = false
     }
-    private fun SignalStrength()
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun prameters()
     {
         var RSRP_SCView = findViewById<TextView>(R.id.RSRP_SC)
         var RSRP_NCView = findViewById<TextView>(R.id.RSRP_NC)
@@ -92,6 +97,7 @@ class MainActivity : AppCompatActivity()
         var PLMNView = findViewById<TextView>(R.id.PLMN)
         var CellIdView = findViewById<TextView>(R.id.Cell_Id)
         var NetworkTypeView = findViewById<TextView>(R.id.NetworkType)
+        var currentTime = findViewById<TextView>(R.id.current_time)
 
         var servingCellSignalStrength = 0
         var servingCellSignalQuality = 0
@@ -182,6 +188,12 @@ class MainActivity : AppCompatActivity()
         PLMNView.text = "Serving cell PLMN : " + servingCellPLMN
         CellIdView.text = "Serving cell id : " + servingCellId.toString()
         NetworkTypeView.text = "Network Type : " + getNetworkType()
+
+        val current = LocalDateTime.now()
+        val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
+        val formatted = current.format(formatter)
+        currentTime.text = "date and time : " +  formatted.toString()
+
         if (servingCellLAC != 0)
         {
             ACView.text = "Serving cell area code : " + servingCellLAC.toString()

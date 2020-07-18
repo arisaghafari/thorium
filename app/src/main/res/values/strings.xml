@@ -11,4 +11,5 @@
     <string name="plmn">plmn</string>
     <string name="cell_id">cell id</string>
     <string name="network_type">network type</string>
+    <string name="current_time">current time</string>
 </resources>
