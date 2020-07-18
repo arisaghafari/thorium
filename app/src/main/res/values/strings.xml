@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">mobile_final_project</string>
+    <string name="welcome_to_our_app">Welcome to our app</string>
 </resources>
