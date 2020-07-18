@@ -10,4 +10,5 @@
     <string name="area_code">area code</string>
     <string name="plmn">plmn</string>
     <string name="cell_id">cell id</string>
+    <string name="network_type">network type</string>
 </resources>

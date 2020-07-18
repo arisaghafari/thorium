@@ -91,6 +91,7 @@ class MainActivity : AppCompatActivity()
         var ACView = findViewById<TextView>(R.id.AC)
         var PLMNView = findViewById<TextView>(R.id.PLMN)
         var CellIdView = findViewById<TextView>(R.id.Cell_Id)
+        var NetworkTypeView = findViewById<TextView>(R.id.NetworkType)
 
         var servingCellSignalStrength = 0
         var servingCellSignalQuality = 0
@@ -180,6 +181,30 @@ class MainActivity : AppCompatActivity()
         CINR_NCView.text = "Neighbor cell signal noise : " + neighborCellSignalnoise.toString()
         PLMNView.text = "Serving cell PLMN : " + servingCellPLMN
         CellIdView.text = "Serving cell id : " + servingCellId.toString()
+        NetworkTypeView.text = "Network Type : " + getNetworkType()
         //Build a request to turn on the location
+    }
+    fun getNetworkType(): String{
+        val telephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+        var textV1 : String = ""
+        when (telephonyManager.networkType) {
+            7 -> textV1 = "1xRTT"
+            4 -> textV1 = "CDMA"
+            2 -> textV1 = "EDGE"
+            14 -> textV1 = "eHRPD"
+            5 -> textV1 = "EVDO rev. 0"
+            6 -> textV1 = "EVDO rev. A"
+            12 -> textV1 = "EVDO rev. B"
+            1 -> textV1 = "GPRS"
+            8 -> textV1 = "HSDPA"
+            10 -> textV1 = "HSPA"
+            15 -> textV1 = "HSPA+"
+            9 -> textV1 = "HSUPA"
+            11 -> textV1 = "iDen"
+            13 -> textV1 = "LTE"
+            3 -> textV1 = "UMTS"
+            0 -> textV1 = "Unknown"
+        }
+        return textV1
     }
 }
