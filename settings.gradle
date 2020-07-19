@@ -1,2 +1,2 @@
 include ':app'
-rootProject.name = "mobile_final_project"
+rootProject.name = "routingProject"
