@@ -11,6 +11,7 @@ import androidx.room.PrimaryKey
 ))
 data class Cell(
     @PrimaryKey(autoGenerate = true)
+    var ID: Long?=null,
     var cellId: Long?=null,
     var RSRP: String?,
     var RSRQ: String?,

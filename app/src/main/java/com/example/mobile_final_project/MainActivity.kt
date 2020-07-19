@@ -22,27 +22,16 @@ class MainActivity : AppCompatActivity()
 {
     private var mTrafficSpeedMeasurer: TrafficSpeedMeasurer? = null
     private var mTextView: TextView? = null
+    private var db:CellRoomDatabase? = null
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        /*val permissionCheck = ContextCompat.checkSelfPermission(
-            MainActivity,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        )
-        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-            // ask permissions here using below code
-            ActivityCompat.requestPermissions(
-                MainActivity,
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                REQUEST_CODE
-            )
-        }*/
         prameters()
         mTextView = findViewById(R.id.connection_class)
         mTrafficSpeedMeasurer = TrafficSpeedMeasurer(TrafficSpeedMeasurer.TrafficType.ALL)
         mTrafficSpeedMeasurer!!.startMeasuring()
-        //println("hi")
     }
 
     override fun onDestroy()
@@ -206,7 +195,11 @@ class MainActivity : AppCompatActivity()
         {
             ACView.text = "Serving cell area code : " + servingCellRAC.toString()
         }
-        //Build a request to turn on the location
+        val info = Cell(cellId = servingCellId.toLong(), RSRP = servingCellSignalStrength.toString(), RSRQ = servingCellSignalQuality.toString()
+            , CINR = servingCellSignalnoise.toString(), AC = ACView.toString(), PLMN = servingCellPLMN, currentTime = currentTime.toString()
+            , altitude = 0.toFloat(), longtitude = 0.toFloat(), cellType = NetworkTypeView.toString())
+        db?.CellDao()?.insert(info)
+        //var list = db?.CellDao()?.AllCell()
     }
     fun getNetworkType(): String{
         val telephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager

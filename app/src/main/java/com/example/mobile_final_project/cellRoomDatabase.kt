@@ -1,6 +1,7 @@
 package com.example.mobile_final_project
 
 import android.content.Context
+import android.provider.SyncStateContract.Helpers.insert
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -11,7 +12,7 @@ import kotlinx.coroutines.launch
 @Database(entities = arrayOf(Cell::class), version = 1, exportSchema = false)
 abstract class CellRoomDatabase : RoomDatabase() {
 
-    abstract fun LTECellDao(): CellDao
+    abstract fun CellDao(): CellDao
 
     private class CellDatabaseCallback(
         private val scope: CoroutineScope
@@ -21,14 +22,14 @@ abstract class CellRoomDatabase : RoomDatabase() {
             super.onOpen(db)
             INSTANCE?.let { database ->
                 scope.launch {
-                    var LTECellDao = database.LTECellDao()
+                    var CellDao = database.CellDao()
 
                     // Delete all content here.
-                    LTECellDao.deleteAll()
+                    CellDao.deleteAll()
 
                     // Add sample words.
-                    var LTE_Cell = Cell(1, "1", "1", "1", "1", "1", 51.3890.toFloat(), 35.6892.toFloat(), "LTE", "1 AM")
-                    LTECellDao.insert(LTE_Cell)
+                    var Cell = Cell(1, 1, "1", "1", "1", "1", "1", 51.3890.toFloat(), 35.6892.toFloat(), "LTE", "1 AM")
+                    CellDao.insert(Cell)
                 }
             }
         }
