@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">mobile_final_project</string>
+    <string name="connection_class">connection class</string>
+    <string name="rsrp">RSRP_ServingCell</string>
+    <string name="rsrp_neighborcell">RSRP_NeighborCell</string>
+    <string name="rsrq_servingcell">RSRQ_ServingCell</string>
+    <string name="rerq_neighborcell">RERQ_NeighborCell</string>
+    <string name="cinr_servingcell">CINR_ServingCell</string>
+    <string name="cinr_neighborcell">CINR_NeighborCell</string>
+    <string name="area_code">area code</string>
+    <string name="plmn">plmn</string>
+    <string name="cell_id">cell id</string>
+    <string name="network_type">network type</string>
+    <string name="current_time">current time</string>
+</resources>
