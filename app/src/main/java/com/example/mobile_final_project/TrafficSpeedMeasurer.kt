@@ -55,6 +55,8 @@ class TrafficSpeedMeasurer(private val mTrafficType: TrafficType) {
         }
         mPreviousDownStream = newBytesDownStream
         mPreviousUpStream = newBytesUpStream
+        //stopMeasuring()
+        //println("hiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii2")
     }
 
     private fun finalReadTrafficStats() {

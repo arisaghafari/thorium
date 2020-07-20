@@ -5,6 +5,8 @@ import java.time.LocalDateTime
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.telephony.CellInfoGsm
 import android.telephony.CellInfoLte
 import android.telephony.CellInfoWcdma
@@ -28,10 +30,17 @@ class MainActivity : AppCompatActivity()
     {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        prameters()
         mTextView = findViewById(R.id.connection_class)
         mTrafficSpeedMeasurer = TrafficSpeedMeasurer(TrafficSpeedMeasurer.TrafficType.ALL)
         mTrafficSpeedMeasurer!!.startMeasuring()
+
+        val mainHandler = Handler(Looper.getMainLooper())
+        mainHandler.post(object : Runnable {
+            override fun run() {
+                prameters()
+                mainHandler.postDelayed(this, 5000)
+            }
+        })
     }
 
     override fun onDestroy()
