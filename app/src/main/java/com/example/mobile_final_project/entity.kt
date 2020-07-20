@@ -27,5 +27,5 @@ data class Cell(
 data class Rout(
     @PrimaryKey(autoGenerate = true)
     var ID: Long ?= null,
-    var rout: List<Long>
+    var rout: String?
 )
