@@ -41,4 +41,7 @@ dependencies {
     implementation 'org.osmdroid:osmdroid-geopackage:6.1.1'
     implementation 'org.osmdroid:osmdroid-third-party:6.0.1'
     implementation 'com.github.MKergall:osmbonuspack:6.6.0'
+    //noinspection GradleDynamicVersion
+    implementation 'com.google.maps.android:android-maps-utils:0.4+'
+
 }

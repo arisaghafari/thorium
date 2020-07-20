@@ -10,11 +10,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import org.osmdroid.bonuspack.routing.OSRMRoadManager
+import org.osmdroid.bonuspack.routing.Road
 import org.osmdroid.bonuspack.routing.RoadManager
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polyline
 import java.util.*
 
@@ -51,7 +53,7 @@ class MainActivity : AppCompatActivity() {
         )
         map!!.setBuiltInZoomControls(true);
         map!!.setMultiTouchControls(true);
-        val startPoint = GeoPoint(35.704985, 51.408534)
+        val startPoint = GeoPoint(35.702385, 51.408560)
         val mapController = map!!.controller
         mapController.setZoom(9)
         mapController.setCenter(startPoint)
@@ -59,11 +61,21 @@ class MainActivity : AppCompatActivity() {
         val waypoints = ArrayList<GeoPoint>()
         waypoints.add(startPoint)
         val endPoint = GeoPoint(35.705909, 51.406097)
+        val lat: Double = startPoint.getLatitude()
+        val lng: Double = startPoint.getLongitude()
         waypoints.add(endPoint)
         val road = roadManager.getRoad(waypoints)
-        val roadOverlay: Polyline = RoadManager.buildRoadOverlay(road)
-        map!!.overlays.add(roadOverlay)
-        map!!.invalidate()
+        if (road.mStatus != Road.STATUS_OK){
+            val startMarker = Marker(map)
+            startMarker.position = startPoint
+            startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+            map!!.overlays.add(startMarker)
+            map!!.invalidate()
+        }else{
+            val roadOverlay: Polyline = RoadManager.buildRoadOverlay(road)
+            map!!.overlays.add(roadOverlay)
+            map!!.invalidate()
+        }
 
     }
 
