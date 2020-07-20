@@ -1,11 +1,13 @@
 package com.example.routingproject
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.StrictMode
 import android.preference.PreferenceManager
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -21,9 +23,10 @@ import org.osmdroid.views.overlay.Polyline
 import java.util.*
 
 
-class MainActivity : AppCompatActivity() {
+open class MainActivity : AppCompatActivity() {
     private val REQUEST_PERMISSIONS_REQUEST_CODE = 1
     private var map: MapView? = null
+    private var changePage = false
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -53,7 +56,7 @@ class MainActivity : AppCompatActivity() {
         )
         map!!.setBuiltInZoomControls(true);
         map!!.setMultiTouchControls(true);
-        val startPoint = GeoPoint(35.702385, 51.408560)
+        val startPoint = GeoPoint(35.703705, 51.409145)
         val mapController = map!!.controller
         mapController.setZoom(9)
         mapController.setCenter(startPoint)
@@ -69,6 +72,11 @@ class MainActivity : AppCompatActivity() {
             val startMarker = Marker(map)
             startMarker.position = startPoint
             startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+            startMarker.setOnMarkerClickListener { marker, mapView ->
+                onMarkerClickDefault(marker)
+                mapView.controller.animateTo(marker.position)
+                true
+            }
             map!!.overlays.add(startMarker)
             map!!.invalidate()
         }else{
@@ -135,4 +143,10 @@ class MainActivity : AppCompatActivity() {
             )
         }
     }
+    private fun onMarkerClickDefault(marker: Marker): Boolean {
+        val intent = Intent(this@MainActivity, DetailActivity::class.java)
+        startActivity(intent)
+        return true
+    }
+
 }
