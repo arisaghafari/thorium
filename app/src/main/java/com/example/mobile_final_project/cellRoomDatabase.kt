@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 abstract class CellRoomDatabase : RoomDatabase() {
 
     abstract fun CellDao(): CellDao
+    abstract fun RoutDao(): routDao
 
     private class CellDatabaseCallback(
         private val scope: CoroutineScope
@@ -23,13 +24,20 @@ abstract class CellRoomDatabase : RoomDatabase() {
             INSTANCE?.let { database ->
                 scope.launch {
                     var CellDao = database.CellDao()
+                    var RoutDao = database.RoutDao()
 
                     // Delete all content here.
                     CellDao.deleteAll()
+                    RoutDao.deleteAll()
 
                     // Add sample words.
                     var Cell = Cell(1, 1, "1", "1", "1", "1", "1", 51.3890.toFloat(), 35.6892.toFloat(), "LTE", "1 AM")
                     CellDao.insert(Cell)
+
+                    val list = mutableListOf<Long>();
+                    list.add(1.toLong())
+                    var rout = Rout(1, list)
+                    RoutDao.insert(rout)
                 }
             }
         }
@@ -49,7 +57,7 @@ abstract class CellRoomDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     CellRoomDatabase::class.java,
-                    "cell_database"
+                    "database"
                 )
                     .allowMainThreadQueries()
                     .build()

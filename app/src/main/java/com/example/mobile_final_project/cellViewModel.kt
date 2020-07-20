@@ -9,18 +9,26 @@ import kotlinx.coroutines.launch
 
 class CellViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val LTErepository: CellRepository
+    private val repository1: CellRepository
+    private val repository2: RoutRepository
 
-    val LTE_allCells: LiveData<List<Cell>>
+    val allCells: LiveData<List<Cell>>
+    val allRout: LiveData<List<Rout>>
 
     init {
-        val LTE_cellsDao = CellRoomDatabase.getDatabase(application).LTECellDao()
-        LTErepository = CellRepository(LTE_cellsDao)
-        LTE_allCells = LTErepository.allCells
+        val cellsDao = CellRoomDatabase.getDatabase(application).CellDao()
+        repository1 = CellRepository(cellsDao)
+        allCells = repository1.allCells
+        val routsDao = CellRoomDatabase.getDatabase(application).RoutDao()
+        repository2 = RoutRepository(routsDao)
+        allRout = repository2.allRouts
     }
 
-    fun LTEinsert(cell: Cell) = viewModelScope.launch(Dispatchers.IO) {
-        LTErepository.insert(cell)
+    fun insertCell(cell: Cell) = viewModelScope.launch(Dispatchers.IO) {
+        repository1.insert(cell)
     }
 
+    fun insertRout(rout: Rout) = viewModelScope.launch(Dispatchers.IO) {
+        repository2.insert(rout)
+    }
 }

@@ -11,3 +11,12 @@ class CellRepository(private val cellDao : CellDao) {
         cellDao.insert(cell)
     }
 }
+
+class RoutRepository(private val routDao : routDao) {
+
+    val allRouts: LiveData<List<Rout>> = routDao.getAllRoutInfo()
+
+    suspend fun insert(rout : Rout) {
+        routDao.insert(rout)
+    }
+}
