@@ -1,4 +1,5 @@
 <resources>
+
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
@@ -7,4 +8,8 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="word_title">word_title</style>
+
+    <style name="SplashScreen" parent="Theme.AppCompat.Light.NoActionBar">
+    </style>
 </resources>
