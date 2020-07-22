@@ -21,7 +21,11 @@ data class Cell(
     var altitude: Double,
     var longtitude: Double,
     var cellType: String?,
-    var currentTime : String?
+    var currentTime : String?,
+    var latency : String?,
+    var downloadRate : String?,
+    var uploadRate : String?
+
 )
 @Entity(tableName = "rout_table")
 data class Rout(

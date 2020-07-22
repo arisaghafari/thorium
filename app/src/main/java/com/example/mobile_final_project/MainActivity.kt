@@ -45,6 +45,9 @@ class MainActivity : AppCompatActivity() {
     private var map: MapView? = null
     private var lat = 0.0
     private var lon = 0.0
+    private var downloadRate = ""
+    private var uploadRate = ""
+    private var latency = ""
     @SuppressLint("RestrictedApi")
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -79,16 +82,14 @@ class MainActivity : AppCompatActivity() {
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
             )
         )
-
         mTextView = findViewById(R.id.connection_class)
         mTrafficSpeedMeasurer = TrafficSpeedMeasurer(TrafficSpeedMeasurer.TrafficType.ALL)
         mTrafficSpeedMeasurer!!.startMeasuring()
-
         val mainHandler = Handler(Looper.getMainLooper())
         mainHandler.post(object : Runnable {
             override fun run() {
+                //println("chera vaghean!!!!!!!!!!")
                 prameters()
-                executeCommand()
                 mainHandler.postDelayed(this, 5000)
             }
         })
@@ -121,8 +122,9 @@ class MainActivity : AppCompatActivity() {
                     Utils.parseSpeed(upStream, SHOW_SPEED_IN_BITS)
                 val downStreamSpeed: String =
                     Utils.parseSpeed(downStream, SHOW_SPEED_IN_BITS)
-                mTextView!!.text =
-                    "$upStreamSpeed \n\n$downStreamSpeed"
+                //mTextView!!.text = "$upStreamSpeed \n\n$downStreamSpeed"
+                downloadRate = downStreamSpeed
+                uploadRate = upStreamSpeed
             }
         }
     }
@@ -133,7 +135,7 @@ class MainActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun prameters() {
-        var RSRP_SCView = findViewById<TextView>(R.id.RSRP_SC)
+       /* var RSRP_SCView = findViewById<TextView>(R.id.RSRP_SC)
         var RSRP_NCView = findViewById<TextView>(R.id.RSRP_NC)
         var RSRQ_SCView = findViewById<TextView>(R.id.RSRQ_SC)
         var RSRQ_NCView = findViewById<TextView>(R.id.RSRQ_NC)
@@ -145,7 +147,7 @@ class MainActivity : AppCompatActivity() {
         var NetworkTypeView = findViewById<TextView>(R.id.NetworkType)
         var currentTime = findViewById<TextView>(R.id.current_time)
         var latView = findViewById<TextView>(R.id.lat)
-        var lonView = findViewById<TextView>(R.id.lon)
+        var lonView = findViewById<TextView>(R.id.lon)*/
 
         var servingCellSignalStrength = 0
         var servingCellSignalQuality = 0
@@ -213,7 +215,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-        RSRP_SCView.text = servingCellSignalStrength.toString()
+        /*RSRP_SCView.text = servingCellSignalStrength.toString()
         RSRP_NCView.text = neighborCellSignalStrength.toString()
         RSRQ_SCView.text = servingCellSignalQuality.toString()
         RSRQ_NCView.text = neighborCellSignalQuality.toString()
@@ -221,36 +223,40 @@ class MainActivity : AppCompatActivity() {
         CINR_NCView.text = neighborCellSignalnoise.toString()
         PLMNView.text = servingCellPLMN
         CellIdView.text = servingCellId.toString()
-        NetworkTypeView.text = getNetworkType()
+        NetworkTypeView.text = getNetworkType()*/
         // latView.text = "latitude : " + lat.toString()
         // lonView.text = "longitude : " + lon.toString()
 
         val current = LocalDateTime.now()
         val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
         val formatted = current.format(formatter)
-        currentTime.text = formatted.toString()
-
+        //currentTime.text = formatted.toString()
+        var AC = 0
         if (servingCellLAC != 0) {
-            ACView.text = servingCellLAC.toString()
+            //ACView.text = servingCellLAC.toString()
+            AC = servingCellLAC
         } else if (servingCellTAC != 0) {
-            ACView.text = servingCellTAC.toString()
+            //ACView.text = servingCellTAC.toString()
+            AC = servingCellTAC
         } else if (servingCellRAC != 0) {
-            ACView.text = servingCellRAC.toString()
+            //ACView.text = servingCellRAC.toString()
+            AC = servingCellRAC
         }
         //getLastLocation()
-        val info = Cell(
-            cellId = servingCellId.toLong(),
+        executeCommand()
+        val info = Cell(cellId = servingCellId.toLong(),
             RSRP = servingCellSignalStrength.toString(),
-            RSRQ = servingCellSignalQuality.toString()
-            ,
+            RSRQ = servingCellSignalQuality.toString(),
             CINR = servingCellSignalnoise.toString(),
-            AC = ACView.toString(),
+            AC = AC.toString(),
             PLMN = servingCellPLMN,
-            currentTime = currentTime.toString()
-            ,
-            altitude = 0.toDouble(),
-            longtitude = 0.toDouble(),
-            cellType = NetworkTypeView.toString()
+            currentTime = formatted.toString(),
+            altitude = lat,
+            longtitude = lon,
+            cellType = getNetworkType(),
+            downloadRate = downloadRate,
+            uploadRate = uploadRate,
+            latency = latency
         )
         db?.CellDao()?.insert(info)
         //var list = db?.CellDao()?.AllCell()
@@ -289,7 +295,8 @@ class MainActivity : AppCompatActivity() {
             val mIpAddrProcess = runtime.exec("/system/bin/ping -c 1 8.8.8.8")
             val mExitValue = mIpAddrProcess.waitFor()
             var time2 = System.currentTimeMillis()
-            latencyView.text = (time2 - time1).toString() + " ms"
+            //latencyView.text = (time2 - time1).toString() + " ms"
+            latency = (time2 - time1).toString() + " ms"
             println(" mExitValue $mExitValue")
             return mExitValue == 0
 
