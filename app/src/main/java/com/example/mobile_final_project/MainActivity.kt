@@ -2,12 +2,13 @@ package com.example.mobile_final_project
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationManager
 import android.net.ConnectivityManager
-import android.os.Build
-import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
+import android.os.*
+import android.preference.PreferenceManager
 import android.telephony.CellInfoGsm
 import android.telephony.CellInfoLte
 import android.telephony.CellInfoWcdma
@@ -18,23 +19,67 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.google.android.gms.location.*
+import org.osmdroid.config.Configuration
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import java.io.IOException
 import java.net.InetAddress
 import java.net.UnknownHostException
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
+import java.util.ArrayList
 
 
 class MainActivity : AppCompatActivity() {
     private var mTrafficSpeedMeasurer: TrafficSpeedMeasurer? = null
     private var mTextView: TextView? = null
     private var db: CellRoomDatabase? = null
+    private val REQUEST_PERMISSIONS_REQUEST_CODE = 1
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private var map: MapView? = null
+    private var lat = 0.0
+    private var lon = 0.0
     @SuppressLint("RestrictedApi")
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        val ctx = applicationContext
+        Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx))
+        val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
+        StrictMode.setThreadPolicy(policy)
+
+        map = findViewById<MapView>(R.id.map)
+        map?.setBuiltInZoomControls(true)
+        map?.setMultiTouchControls(true)
+        map?.setTileSource(TileSourceFactory.MAPNIK)
+        val startPoint = GeoPoint(35.705328, 51.408065)
+        val mapController = map!!.controller
+        mapController.setZoom(12)
+        mapController.setCenter(startPoint)
+
+        val loc = GpsMyLocationProvider(applicationContext)
+        var mLocationOverlay = MyLocationNewOverlay(loc, map)
+        mLocationOverlay.enableMyLocation()
+        mLocationOverlay.enableFollowLocation()
+        mLocationOverlay.isDrawAccuracyEnabled
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        getLastLocation()
+
+        requestPermissionsIfNecessary(
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+        )
+
         mTextView = findViewById(R.id.connection_class)
         mTrafficSpeedMeasurer = TrafficSpeedMeasurer(TrafficSpeedMeasurer.TrafficType.ALL)
         mTrafficSpeedMeasurer!!.startMeasuring()
@@ -57,11 +102,13 @@ class MainActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         mTrafficSpeedMeasurer?.removeListener(mStreamSpeedListener)
+        map?.onPause()
     }
 
     override fun onResume() {
         super.onResume()
         mTrafficSpeedMeasurer?.registerListener(mStreamSpeedListener)
+        map?.onResume()
     }
 
     private val mStreamSpeedListener: ITrafficSpeedListener = object : ITrafficSpeedListener {
@@ -267,4 +314,105 @@ class MainActivity : AppCompatActivity() {
             println("Sorry ! We can't reach to this host")
         }
     }
+    private fun isLocationEnabled(): Boolean {
+        val locationManager: LocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
+            LocationManager.NETWORK_PROVIDER
+        )
+    }
+    private fun getLastLocation() {
+        if (isLocationEnabled()) {
+            if (ActivityCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                return
+            }
+            fusedLocationClient.lastLocation.addOnCompleteListener(this) { task ->
+                task.result
+                requestNewLocationData()
+            }
+        } else {
+            Toast.makeText(this, "Turn on location", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun requestNewLocationData() {
+        var mLocationRequest = LocationRequest()
+        mLocationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        mLocationRequest.interval = 9000
+        mLocationRequest.fastestInterval = 5000
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
+        fusedLocationClient.requestLocationUpdates(
+            mLocationRequest, mLocationCallback,
+            Looper.myLooper()
+        )
+    }
+
+    private val mLocationCallback = object : LocationCallback() {
+        override fun onLocationResult(locationResult: LocationResult) {
+            var mLastLocation: Location = locationResult.lastLocation
+            lat = mLastLocation.latitude
+            lon = mLastLocation.longitude
+        }
+    }
+
+
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String?>,
+        grantResults: IntArray
+    ) {
+        val permissionsToRequest: ArrayList<String?> = ArrayList()
+        for (i in grantResults.indices) {
+            permissionsToRequest.add(permissions[i])
+        }
+        if (permissionsToRequest.size > 0) {
+            ActivityCompat.requestPermissions(
+                this,
+                permissionsToRequest.toArray(arrayOfNulls(0)),
+                REQUEST_PERMISSIONS_REQUEST_CODE
+            )
+        }
+    }
+    private fun requestPermissionsIfNecessary(permissions: Array<String>) {
+        val permissionsToRequest: ArrayList<String> = ArrayList()
+        for (permission in permissions) {
+            if (ContextCompat.checkSelfPermission(this, permission)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                // Permission is not granted
+                permissionsToRequest.add(permission)
+            }
+        }
+        if (permissionsToRequest.size > 0) {
+            ActivityCompat.requestPermissions(
+                this,
+                permissionsToRequest.toArray(arrayOfNulls(0)),
+                REQUEST_PERMISSIONS_REQUEST_CODE
+            )
+        }
+    }
+    private fun onMarkerClickDefault(marker: Marker): Boolean {
+        val intent = Intent(this@MainActivity, DetailActivity::class.java)
+        startActivity(intent)
+        return true
+    }
+
 }
