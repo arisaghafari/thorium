@@ -12,4 +12,22 @@
     <string name="cell_id">cell id</string>
     <string name="network_type">network type</string>
     <string name="current_time">current time</string>
+    <string name="altitude">latitude</string>
+    <string name="longtitude">longitude</string>
+    <string name="latency">latency</string>
+    <string name="up_stream_speed_down_stream_speed">Up Stream Speed \n\nDown Stream Speed :</string>
+    <string name="textview">Serving cell signal strength : </string>
+    <string name="textview2">Neighbor cell signal strength : </string>
+    <string name="textview3">Serving cell signal quality : </string>
+    <string name="textview5">Neighbor cell signal quality : </string>
+    <string name="textview6">Serving cell signal noise : </string>
+    <string name="textview7">Neighbor cell signal noise : </string>
+    <string name="textview8">Serving cell area code : </string>
+    <string name="textview9">Serving cell PLMN : </string>
+    <string name="textview10">Serving cell id : </string>
+    <string name="textview11">Network Type : </string>
+    <string name="textview12">date and time : </string>
+    <string name="textview13">latitude : </string>
+    <string name="textview14">longitude : </string>
+    <string name="textview15">latency : </string>
 </resources>

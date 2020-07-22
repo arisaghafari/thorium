@@ -18,8 +18,8 @@ data class Cell(
     var CINR: String?,
     var AC: String?,
     var PLMN: String?,
-    var altitude: Float,
-    var longtitude: Float,
+    var altitude: Double,
+    var longtitude: Double,
     var cellType: String?,
     var currentTime : String?
 )

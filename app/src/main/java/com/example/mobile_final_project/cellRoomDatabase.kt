@@ -30,7 +30,7 @@ abstract class CellRoomDatabase : RoomDatabase() {
                     CellDao.deleteAll()
                     RoutDao.deleteAll()
 
-                    var Cell = Cell(1, 1, "1", "1", "1", "1", "1", 51.3890.toFloat(), 35.6892.toFloat(), "LTE", "1 AM")
+                    var Cell = Cell(1, 1, "1", "1", "1", "1", "1", 51.3890, 35.6892, "LTE", "1 AM")
                     CellDao.insert(Cell)
 
                     var rout = Rout(1, "1")
