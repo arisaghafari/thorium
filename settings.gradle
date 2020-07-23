@@ -1,2 +1,2 @@
 include ':app'
-rootProject.name='Rhodium Project'
+rootProject.name = "mobile_final_project"
