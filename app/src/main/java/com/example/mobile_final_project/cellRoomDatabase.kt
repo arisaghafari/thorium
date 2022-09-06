@@ -27,12 +27,14 @@ abstract class CellRoomDatabase : RoomDatabase() {
                     var RoutDao = database.RoutDao()
 
                     // Delete all content here.
+
                     //CellDao.deleteAll()
                     //RoutDao.deleteAll()
 
 //                    var Cell = Cell(1, 1, "1", "1", "1", "1", "1", 51.3890, 35.6892, "LTE", "1 AM", "",
 //                    "", "")
 //                    CellDao.insert(Cell)
+
 
                     var rout = Rout(1, "1")
                     RoutDao.insert(rout)

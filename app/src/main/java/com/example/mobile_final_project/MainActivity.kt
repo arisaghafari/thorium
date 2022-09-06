@@ -6,6 +6,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
+
+import android.net.ConnectivityManager
 import android.os.*
 import android.preference.PreferenceManager
 import android.telephony.CellInfoGsm
@@ -24,6 +26,7 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
+
 import org.osmdroid.views.overlay.Polyline
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
@@ -40,10 +43,13 @@ import org.osmdroid.bonuspack.routing.RoadManager
 import org.osmdroid.views.overlay.Overlay
 
 
+
 class MainActivity : AppCompatActivity() {
     private var mTrafficSpeedMeasurer: TrafficSpeedMeasurer? = null
     private var mTextView: TextView? = null
+
     private var db:CellRoomDatabase? = null
+
     private val REQUEST_PERMISSIONS_REQUEST_CODE = 1
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var map: MapView? = null
@@ -57,7 +63,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         db = CellRoomDatabase.getDatabase(context = this)
+
         val ctx = applicationContext
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx))
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
@@ -95,6 +103,7 @@ class MainActivity : AppCompatActivity() {
             override fun run() {
                 prameters()
                 pointer()
+
                 mainHandler.postDelayed(this, 5000)
             }
         })
@@ -263,6 +272,7 @@ class MainActivity : AppCompatActivity() {
             uploadRate = uploadRate,
             latency = latency
         )
+
         var flag = true
         val templat = (lat * 100).toInt()
         var templon = (lon * 100).toInt()
@@ -288,6 +298,7 @@ class MainActivity : AppCompatActivity() {
             db?.CellDao()?.insert(info)
             println("insert $flag")
         }
+
     }
 
     fun getNetworkType(): String {
@@ -444,6 +455,7 @@ class MainActivity : AppCompatActivity() {
             )
         }
     }
+
     private fun onMarkerClickDefault(id : Long?): Boolean {
         val intent = Intent(this@MainActivity, DetailActivity::class.java)
         intent.putExtra("id", id.toString())
@@ -489,4 +501,5 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
 }

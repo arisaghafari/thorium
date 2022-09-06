@@ -22,6 +22,7 @@
         <activity android:name=".DetailActivity" />
         <activity android:name=".SplashScreen"
             android:theme="@style/SplashScreen">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
