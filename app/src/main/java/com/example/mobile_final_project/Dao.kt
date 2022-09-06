@@ -10,19 +10,22 @@ interface CellDao {
     fun insert(cell : Cell)
 
     @Update
-    fun updateUsers(cell : Cell)
+
+    fun update(cell : Cell)
 
     @Delete
-    fun deleteUsers(cell : Cell)
+    fun delete(cell : Cell)
 
     @Query("SELECT * from point_table ORDER BY cellId ASC")
     fun getAllCellInfo(): LiveData<List<Cell>>
 
-    @Query("SELECT * from point_table ORDER BY cellId ASC")
+
+    @Query("SELECT * from point_table")
     fun AllCell(): List<Cell>
 
-    @Query("DELETE FROM point_table")
-    fun deleteAll()
+    //@Query("DELETE FROM point_table")
+    //fun deleteAll()
+
 }
 @Dao
 interface routDao{
@@ -31,10 +34,12 @@ interface routDao{
     fun insert(rout : Rout)
 
     @Update
-    fun updateUsers(rout : Rout)
+
+    fun update(rout : Rout)
 
     @Delete
-    fun deleteUsers(rout : Rout)
+    fun delete(rout : Rout)
+
 
     @Query("SELECT * from rout_table ORDER BY ID ASC")
     fun getAllRoutInfo(): LiveData<List<Rout>>
@@ -42,6 +47,8 @@ interface routDao{
     @Query("SELECT * from rout_table ORDER BY ID ASC")
     fun AllCell(): List<Rout>
 
-    @Query("DELETE FROM rout_table")
-    fun deleteAll()
+
+    //@Query("DELETE FROM rout_table")
+    //fun deleteAll()
+
 }

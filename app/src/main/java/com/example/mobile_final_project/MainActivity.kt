@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
+
 import android.net.ConnectivityManager
 import android.os.*
 import android.preference.PreferenceManager
@@ -25,6 +26,8 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
+
+import org.osmdroid.views.overlay.Polyline
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import java.io.IOException
@@ -34,12 +37,19 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.ArrayList
+import org.osmdroid.bonuspack.routing.OSRMRoadManager
+import org.osmdroid.bonuspack.routing.Road
+import org.osmdroid.bonuspack.routing.RoadManager
+import org.osmdroid.views.overlay.Overlay
+
 
 
 class MainActivity : AppCompatActivity() {
     private var mTrafficSpeedMeasurer: TrafficSpeedMeasurer? = null
     private var mTextView: TextView? = null
-    private var db: CellRoomDatabase? = null
+
+    private var db:CellRoomDatabase? = null
+
     private val REQUEST_PERMISSIONS_REQUEST_CODE = 1
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var map: MapView? = null
@@ -53,6 +63,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        db = CellRoomDatabase.getDatabase(context = this)
+
         val ctx = applicationContext
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx))
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
@@ -88,8 +101,9 @@ class MainActivity : AppCompatActivity() {
         val mainHandler = Handler(Looper.getMainLooper())
         mainHandler.post(object : Runnable {
             override fun run() {
-                //println("chera vaghean!!!!!!!!!!")
                 prameters()
+                pointer()
+
                 mainHandler.postDelayed(this, 5000)
             }
         })
@@ -258,8 +272,33 @@ class MainActivity : AppCompatActivity() {
             uploadRate = uploadRate,
             latency = latency
         )
-        db?.CellDao()?.insert(info)
-        //var list = db?.CellDao()?.AllCell()
+
+        var flag = true
+        val templat = (lat * 100).toInt()
+        var templon = (lon * 100).toInt()
+        var list = db?.CellDao()?.AllCell()
+        if (list != null) {
+            for (cell in list){
+                var tempCellAl = (cell.altitude * 100).toInt()
+                var tempCellLon = (cell.longtitude * 100).toInt()
+                if(tempCellAl == templat && tempCellLon == templon){
+                    println("update $flag")
+                    db?.CellDao()?.update(info)
+                    flag = false
+                    println("flag :  $flag")
+                }
+
+            }
+        }
+        println("flag 2 : $flag")
+        if (lat == 0.0 && lon == 0.0) {
+            flag = false
+        }
+        if (flag) {
+            db?.CellDao()?.insert(info)
+            println("insert $flag")
+        }
+
     }
 
     fun getNetworkType(): String {
@@ -416,10 +455,51 @@ class MainActivity : AppCompatActivity() {
             )
         }
     }
-    private fun onMarkerClickDefault(marker: Marker): Boolean {
+
+    private fun onMarkerClickDefault(id : Long?): Boolean {
         val intent = Intent(this@MainActivity, DetailActivity::class.java)
+        intent.putExtra("id", id.toString())
         startActivity(intent)
         return true
+    }
+    private fun pointer() {
+        val list = db?.CellDao()?.AllCell()
+        if (list != null) {
+            for (cell in list) {
+                val startPoint = GeoPoint(cell.altitude, cell.longtitude)
+                val roadManager: RoadManager = OSRMRoadManager(this)
+                val waypoints = ArrayList<GeoPoint>()
+                val endPoint = GeoPoint(35.700978, 51.396865)
+                waypoints.add(startPoint)
+                waypoints.add(endPoint)
+                val road = roadManager.getRoad(waypoints)
+                if (road.mStatus != Road.STATUS_OK) {
+                    val startMarker = Marker(map)
+                    startMarker.position = startPoint
+                    startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                    startMarker.setOnMarkerClickListener { marker, mapView ->
+                        onMarkerClickDefault(cell.ID)
+                        mapView.controller.animateTo(marker.position)
+                        true
+                    }
+                    map!!.overlays.add(startMarker)
+                    map!!.invalidate()
+                } else {
+                    val startMarker = Marker(map)
+                    startMarker.position = startPoint
+                    startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                    startMarker.setOnMarkerClickListener { marker, mapView ->
+                        onMarkerClickDefault(cell.ID)
+                        mapView.controller.animateTo(marker.position)
+                        true
+                    }
+                    val roadOverlay: Polyline = RoadManager.buildRoadOverlay(road)
+                    val overlays = listOf<Overlay>(roadOverlay, startMarker)
+                    map!!.overlays.addAll(overlays)
+                    map!!.invalidate()
+                }
+            }
+        }
     }
 
 }
